@@ -1,25 +1,23 @@
-import matplotlib
-import matplotlib.pyplot as plt
-import numpy as np
-from selenium import webdriver
 import time
 from PIL import Image
 from io import BytesIO
-import cv2
-import time
+import numpy as np
+import matplotlib.pyplot as plt
+from selenium import webdriver
 
-def printProbabilities(probs,moves):
-    white_probs = [p[0] for p in probs]
+def printProbabilities(probs,player,moves):
+    #probs = [white, draw, black]
+    win_probs = [p[0] if player == 'w' else p[2] for p in probs]
     draw_probs = [p[1] for p in probs]
-    black_probs = [p[2] for p in probs]
+    lose_probs = [p[2] if player == 'w' else p[0] for p in probs]
     labels = moves[:len(probs)]
 
     x = np.arange(len(labels))  # the label locations
-    width = 0.2  # the width of the bars
+    width = 0.13  # the width of the bars
 
     fig, ax = plt.subplots()
-    rects1 = ax.bar(x - width/2, white_probs, width, color='indianred', label='Whites')
-    rects2 = ax.bar(x + width/2, black_probs, width, color='lightsalmon',label='Blacks')
+    rects1 = ax.bar(x - width, win_probs, width, color='indianred', label='Winning')
+    rects2 = ax.bar(x, lose_probs, width, color='lightsalmon',label='Losing')
     rects3 = ax.bar(x + width, draw_probs, width, color='green',label='Draw')
 
     # Add some text for labels, title and custom x-axis tick labels, etc.
@@ -57,8 +55,8 @@ def cropImage(png,e):
     bottom = e.location['y'] + e.size['height'] - 75
     
     im = im.crop((left, top, right, bottom)) # defines crop points
-    im.save('testing.png') # saves new cropped image
-    img = Image.open('testing.png')
+    im.save('Output/chesstable.png') # saves new cropped image
+    img = Image.open('Output/chesstable.png')
     img.show() 
 
 
@@ -71,7 +69,7 @@ def webDriver(query):
     webform.send_keys(query)
     button = driver.find_elements_by_xpath("//button")[2]
     button.click()
-    time.sleep(3)
+    time.sleep(2)
     element = driver.find_element_by_class_name('result')
     png = driver.get_screenshot_as_png()
     cropImage(png,element)

@@ -17,9 +17,9 @@ def probabilities(data):
     blacks = data['black']
     return [round(whites*100/total,2), round(draws*100/total,2), round(blacks*100/total,2)]
 
-def obtainProbabilities(moves):
+def obtainProbabilities(fens):
     probs = []
-    for fen in chess.obtainFenFormat(moves):
+    for fen in fens:
         data = chessRequest(fen)
         if data['topGames']:
             probs.append(probabilities(data))

@@ -1,40 +1,50 @@
-import src.chessfunction as cfn
 import re
+import src.chessfunction as fn
 
-def move(m,color,table):
-    x = cfn.coord(m)[0]
-    y = cfn.coord(m)[1]
+def movePiece(m,color,table):
+    x = fn.coord(m)[0]
+    y = fn.coord(m)[1]
 
     if len(m) == 2:
-        return cfn.pawnMove(x,y,color,table)
-    elif m[0] == 'C':
-        return cfn.knightMove(x,y,color,table)
-    elif m[0] == 'A':
-        return cfn.bishopMove(x,y,color,table)
-    elif m[0] == 'T':
-        return cfn.towerMove(x,y,color,table)
-    elif m[0] == 'D':
-        return cfn.queenMove(x,y,color,table)
+        return fn.pawnMove(x,y,color,table)
+    elif m[0] == 'N':
+        return fn.knightMove(x,y,color,table)
+    elif m[0] == 'B':
+        return fn.bishopMove(x,y,color,table)
     elif m[0] == 'R':
-        return cfn.kingMove(x,y,color,table)
+        return fn.towerMove(x,y,color,table)
+    elif m[0] == 'Q':
+        return fn.queenMove(x,y,color,table)
+    elif m[0] == 'K':
+        return fn.kingMove(x,y,color,table)
     elif (m[0] in [chr(e) for e in range(97,123)]):
-        x1 = cfn.coord(m[0]+'0')[0]
-        return cfn.pawnCapture(x1,x,y,color,table)
+        x1 = fn.coord(m[0]+'0')[0]
+        return fn.pawnCapture(x1,x,y,color,table)
     return -1
 
+def substituteXs(string):
+    for i in range(8,0,-1):
+        x = ''.join(['x' for i in range(i)])
+        string = string.replace(x,str(i))
+    return string
+   
 def moveChessPieces(m,color,table):
-    if move(m,color,table) == -1:
-        raise ValueError('Move '+m+' is not allowed.')
+    if movePiece(m,color,table) == -1:
+        raise ValueError('Move '+ m +' is not allowed.')
     
-    resulted_table = '/'.join([''.join(e) for e in table][::-1])
-    
-    for i in range(0,8):
-        x = ''.join(['x' for i in range(8-i)])
-        resulted_table = resulted_table.replace(x,str(8-i))
-    #print('\n'.join([''.join(e) for e in table]))
-    return resulted_table
+    fen_table = '/'.join([''.join(e) for e in table][::-1])
+    return substituteXs(fen_table)
 
-def changeColor(color):
+def printRealisticTable(table):
+    table = '\n'.join([' '.join(e) for e in table])
+    table = table.replace('K','♔').replace('k','♚').replace(
+        'Q','♕').replace('q','♛').replace('R','♖').replace(
+            'r','♜').replace('N','♘').replace('n','♞').replace(
+                'B','♗').replace('b','♝').replace('P','♙').replace(
+                    'p','♟').replace('x',' ')
+    print('\n'+ table +'\n')
+
+def switchColor(color):
     return (lambda c:'w' if c == 'b' else 'b')(color)
 
 def obtainFenFormat(chessgame):
@@ -48,16 +58,16 @@ def obtainFenFormat(chessgame):
 
     fens = []
     for m in chessgame:
-        color = changeColor(color)
+        color = switchColor(color)
         fen = moveChessPieces(m,color,table)
 
         if re.search('x',m) or re.search('^[a-h]',m):
             halfCount = 0
         else:
             halfCount += 1
-        count += 1 
+        count += 1
 
-        fen = fen + '%20' + changeColor(color) + '%20KQkq%20'
+        fen = fen + '%20' + switchColor(color) + '%20KQkq%20'
 
         if color == 'w' and re.search('[a-h]4',m):
             fen = fen + m[0] + '3' + '%20'
@@ -67,5 +77,5 @@ def obtainFenFormat(chessgame):
             fen = fen + '-' + '%20'
         fen = fen + str(halfCount) + '%20' + str(int(count/2))
         fens.append(fen)
-        print('\n'+'\n'.join([''.join(e) for e in table])+'\n')
+        printRealisticTable(table)
     return fens
