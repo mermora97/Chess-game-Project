@@ -5,6 +5,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 from selenium import webdriver
 
+def autolabel(ax,rects):
+    """Attach a text label above each bar in *rects*, displaying its height."""
+    for rect in rects:
+        height = rect.get_height()
+        ax.annotate('{}'.format(height),
+                    xy=(rect.get_x() + rect.get_width() / 2, height),
+                    xytext=(0, 3),  # 3 points vertical offset
+                    textcoords="offset points",
+                    ha='center', va='bottom')
+
 def printProbabilities(probs,player,moves):
     #probs = [white, draw, black]
     win_probs = [p[0] if player == 'w' else p[2] for p in probs]
@@ -32,18 +42,8 @@ def printProbabilities(probs,player,moves):
     autolabel(ax,rects3)
 
     fig.tight_layout()
+    plt.savefig('Output/probabilities.png')
     plt.show()
-
-
-def autolabel(ax,rects):
-    """Attach a text label above each bar in *rects*, displaying its height."""
-    for rect in rects:
-        height = rect.get_height()
-        ax.annotate('{}'.format(height),
-                    xy=(rect.get_x() + rect.get_width() / 2, height),
-                    xytext=(0, 3),  # 3 points vertical offset
-                    textcoords="offset points",
-                    ha='center', va='bottom')
 
 
 def cropImage(png,e):

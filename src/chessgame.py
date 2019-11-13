@@ -35,7 +35,12 @@ def moveChessPieces(m,color,table):
     fen_table = '/'.join([''.join(e) for e in table][::-1])
     return substituteXs(fen_table)
 
-def printRealisticTable(table):
+def printRealisticTable(m,count,table):
+    #Heading
+    print('----------------')
+    print(str(int(count/2)) + '. ' + m)
+
+    #Chess table
     table = '\n'.join([' '.join(e) for e in table])
     table = table.replace('K','♔').replace('k','♚').replace(
         'Q','♕').replace('q','♛').replace('R','♖').replace(
@@ -77,5 +82,5 @@ def obtainFenFormat(chessgame):
             fen = fen + '-' + '%20'
         fen = fen + str(halfCount) + '%20' + str(int(count/2))
         fens.append(fen)
-        printRealisticTable(table)
+        printRealisticTable(m,count, table)
     return fens
